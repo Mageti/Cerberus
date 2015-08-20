@@ -191,7 +191,7 @@ function submitForm()
 	);
 	  
 	var auth = make_basic_auth($("input[id=login]").val(),$("input[id=password]").val());
-	var url = "/#{BASE_URL}/oauth/authorize_switch_user";
+	var url = "/<%= "#{BASE_URL}" %>/oauth/authorize_switch_user";
 	var formData = "redirect_uri="+$("input[id=redirect_uri]").val()+"&"+"response_type="+$("input[id=response_type]").val()+"&"+"client_id="+$("input[id=client_id]").val()+"&"+"state="+$("input[id=state]").val();
 		
 	// jQuery
