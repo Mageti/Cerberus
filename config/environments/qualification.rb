@@ -61,3 +61,5 @@ Provider::Application.configure do
   #Enable kerberos feature
   config.middleware.use Rack::Auth::Krb::BasicAndNego, 'my realm', 'my keytab', nil, SECURED_URLS
 end
+
+BASE_URL = 'cerberus-qualif'
