@@ -37,10 +37,19 @@ class ApplicationController < ActionController::Base
   # If he is not authenticated then we will display a Loading popup during the authentication
   #      
   def authenticate_user!
-    if !request.env['REMOTE_USER'].nil?
+    if !env['HTTP_AUTHORIZATION'].nil?
+        # authentification with reverse proxy setting HTTP_AUTHORIZATION header
+        user, pass = Base64.decode64(env['HTTP_AUTHORIZATION'].split[1]).split ':', 2
+    elsif !request.env['REMOTE_USER'].nil?
+        user = request.env['REMOTE_USER']
+    else
+        user = nil
+    end
+
+    if !user.nil?
       #If user is already logged in, we do not retrieve again his information from ldap
       if session[:user_id].nil?
-        authenticated_user = User.find_or_create_from_ldap(request.env['REMOTE_USER'])
+        authenticated_user = User.find_or_create_from_ldap(user)
         if authenticated_user
           session[:user_id] = authenticated_user.id
           statsd = StatsManager.new
@@ -103,13 +112,22 @@ class ApplicationController < ActionController::Base
   #   There are other params which can be passed in the case of a client application, they are dynamically created in authenticate_user!
   #    
   def authenticate_user
-    if !request.env['REMOTE_USER'].nil?
-        logger.debug "Logging user #{env['REMOTE_USER']}"
+    if !env['HTTP_AUTHORIZATION'].nil?
+        # authentification with reverse proxy setting HTTP_AUTHORIZATION header
+        user, pass = Base64.decode64(env['HTTP_AUTHORIZATION'].split[1]).split ':', 2
+    elsif !request.env['REMOTE_USER'].nil?
+        user = request.env['REMOTE_USER']
+    else
+        user = nil
+    end
+
+    if !user.nil?
+        logger.debug "Logging user #{user}"
 
         #puts "You have been automatically authenticated as #{session['REMOTE_USER']} thanks to kerberos !"
         #If user is already logged in the application, we do not retrieve again his information from ldap
         if session[:user_id].nil?
-          authenticated_user = User.find_or_create_from_ldap(request.env['REMOTE_USER'])
+          authenticated_user = User.find_or_create_from_ldap(user)
           if authenticated_user
             session[:user_id] = authenticated_user.id
           else
