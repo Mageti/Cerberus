@@ -67,6 +67,11 @@ Once the VM is provisioned,
 
 Within the VM
 
+* `gem install bundler`
+* exit the VM and re-enter it :
+** `exit`
+** `vagrant ssh`
+
 * `cd /vagrant`
 * `bundle install` to set up the ruby dependencies.
 * `rake db:migrate`
